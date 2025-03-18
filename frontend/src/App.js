@@ -103,7 +103,7 @@ function App() {
       fetchProposals();
       fetchNFTBalance();
     }
-  }, [account, provider]);
+  }, [account, provider, fetchProposals, fetchNFTBalance]);
 
   const handleVote = async (proposalId, isFor) => {
     if (!provider || !account) return;
