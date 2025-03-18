@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { VotingDAOABI } from './abis/VotingDao';
 import { NFTABI } from './abis/NFT';
 import Navbar from './components/Navbar';
@@ -7,7 +7,6 @@ import './App.css';
 const { ethers } = require("ethers");
 const VOTING_DAO_ADDRESS = '0x27b1403F345B8267B6a196472e28AFeDB94598d9';
 const NFT_CONTRACT_ADDRESS = '0x2ec92364276Bd9cb9cd4649197f495B4D460AEd1';
-
 
 function App() {
   const [provider, setProvider] = useState(null);
@@ -21,7 +20,6 @@ function App() {
         const newProvider = new ethers.BrowserProvider(window.ethereum);
         setProvider(newProvider);
         
-        // Check if wallet is already connected
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
         if (accounts.length > 0) {
           setAccount(accounts[0]);
@@ -49,7 +47,8 @@ function App() {
     }
   };
 
-  const fetchProposals = async () => {
+  // ✅ Wrap fetchProposals with useCallback
+  const fetchProposals = useCallback(async () => {
     if (!provider || !account) return;
     
     try {
@@ -84,27 +83,7 @@ function App() {
     } catch (error) {
       console.error('Error fetching proposals:', error);
     }
-  };
-  
-  const fetchNFTBalance = async () => {
-    if (!provider || !account) return;
-    
-    try {
-      const nftContract = new ethers.Contract(NFT_CONTRACT_ADDRESS, NFTABI, provider);
-      const balance = await nftContract.balanceOf(account);
-      setNftBalance(balance.toString());
-    } catch (error) {
-      console.error('Error fetching NFT balance:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (account) {
-      fetchProposals();
-      fetchNFTBalance();
-    }
-  }, [account, provider, fetchProposals, fetchNFTBalance]);
-
+  }, [provider, account]); // ✅ Add dependencies
   const handleVote = async (proposalId, isFor) => {
     if (!provider || !account) return;
     
@@ -122,66 +101,84 @@ function App() {
       alert(`Voting failed: ${error.reason || error.message}`);
     }
   };
+  
+
+  // ✅ Wrap fetchNFTBalance with useCallback
+  const fetchNFTBalance = useCallback(async () => {
+    if (!provider || !account) return;
+    
+    try {
+      const nftContract = new ethers.Contract(NFT_CONTRACT_ADDRESS, NFTABI, provider);
+      const balance = await nftContract.balanceOf(account);
+      setNftBalance(balance.toString());
+    } catch (error) {
+      console.error('Error fetching NFT balance:', error);
+    }
+  }, [provider, account]); // ✅ Add dependencies
+
+  // ✅ Update useEffect to use stable function references
+  useEffect(() => {
+    if (account) {
+      fetchProposals();
+      fetchNFTBalance();
+    }
+  }, [account, provider, fetchProposals, fetchNFTBalance]);
 
   return (
     <>
-    <Navbar />
-    <div>
-      
-      {!account ? (
-        <>
-        <section className='hero'>
-          <div className='main'>
-            <h1 className='header-h1'>Welcome To The Cool Pixel Dao</h1>
-            <h3 className='header-h3'>Where 1 NFT equals 1 vote, Please connect your wallet to see our proposals</h3>
-            <div className='d-conwallet'>
-              <button onClick={connectWallet} className='con-wallet'>Connect Wallet</button>
+      <Navbar />
+      <div>
+        {!account ? (
+          <section className='hero'>
+            <div className='main'>
+              <h1 className='header-h1'>Welcome To The Cool Pixel Dao</h1>
+              <h3 className='header-h3'>Where 1 NFT equals 1 vote, Please connect your wallet to see our proposals</h3>
+              <div className='d-conwallet'>
+                <button onClick={connectWallet} className='con-wallet'>Connect Wallet</button>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <div>
+            <p className='p-wallet'>Connected: {account}</p>
+            <p className='p-nftbal'>Your NFTs: {nftBalance}</p>
+            <div>
+              {proposals.map((proposal) => (
+                <div key={proposal.id} style={{ margin: '20px', padding: '10px', border: '2px solid #ffc20e', borderRadius: '5px' }} className='proposal-div'>
+                  <h3 className='proposal-desc'>{proposal.description}</h3>
+                  <p>Ends: {new Date(proposal.endTime * 1000).toLocaleString()}</p>
+                  <div style={{ display: 'flex', gap: '20px', margin: '10px 0' }}>
+                    <div style={{ color: 'green' }}>
+                      For: {proposal.forVotes}
+                    </div>
+                    <div style={{ color: 'red' }}>
+                      Against: {proposal.againstVotes}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button 
+                      onClick={() => handleVote(proposal.id, true)}
+                      disabled={proposal.hasVoted || !proposal.isActive || nftBalance === '0'}
+                      style={{ backgroundColor: proposal.hasVoted ? '#ccc' : 'green', boxShadow: "2px 2px 0px #939393" }}
+                      className='for-button'
+                    >
+                      {proposal.hasVoted ? 'Voted' : 'Vote For'}
+                    </button>
+                    <button 
+                      onClick={() => handleVote(proposal.id, false)}
+                      disabled={proposal.hasVoted || !proposal.isActive || nftBalance === '0'}
+                      style={{ backgroundColor: proposal.hasVoted ? '#ccc' : 'red', boxShadow: "2px 2px 0px #939393" }}
+                      className='against-button'
+                    >
+                      {proposal.hasVoted ? 'Voted' : 'Vote Against'}
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </section>
-        </>
-      ) : (
-        <div>
-        
-          <p className='p-wallet'>Connected: {account}</p>
-          <p className='p-nftbal'>Your NFTs: {nftBalance}</p>
-          <div>
-            {proposals.map((proposal) => (
-              <div key={proposal.id} style={{ margin: '20px', padding: '10px', border: '2px solid #ffc20e', borderRadius: '5px' }} className='proposal-div'>
-                <h3 className='proposal-desc'>{proposal.description}</h3>
-                <p>Ends: {new Date(proposal.endTime * 1000).toLocaleString()}</p>
-                <div style={{ display: 'flex', gap: '20px', margin: '10px 0' }}>
-                  <div style={{ color: 'green' }}>
-                    For: {proposal.forVotes}
-                  </div>
-                  <div style={{ color: 'red' }}>
-                    Against: {proposal.againstVotes}
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <button 
-                    onClick={() => handleVote(proposal.id, true)}
-                    disabled={proposal.hasVoted || !proposal.isActive || nftBalance === '0'}
-                    style={{ backgroundColor: proposal.hasVoted ? '#ccc' : 'green', boxShadow: "2px 2px 0px #939393" }}
-                    className='for-button'
-                  >
-                    {proposal.hasVoted ? 'Voted' : 'Vote For'}
-                  </button>
-                  <button 
-                    onClick={() => handleVote(proposal.id, false)}
-                    disabled={proposal.hasVoted || !proposal.isActive || nftBalance === '0'}
-                    style={{ backgroundColor: proposal.hasVoted ? '#ccc' : 'red', boxShadow: "2px 2px 0px #939393" }}
-                    className='against-button'
-                  >
-                    {proposal.hasVoted ? 'Voted' : 'Vote Against'}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
     </>
   );
 }
