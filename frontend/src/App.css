@@ -1,38 +1,150 @@
-.App {
+/* Base Styles */
+:root {
+  --primary-color: #2d3748;
+  --success-color: #48bb78;
+  --danger-color: #f56565;
+  --text-color: #1a202c;
+  --bg-color: #0099ff;
+  --card-bg: #ffffff;
+}
+
+@font-face {
+	font-family: 'kemco';
+	src: url(./kemco.ttf);
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'kemco';
+}
+
+/* Layout */
+.container {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  text-align: center;
+  margin: auto;
+}
+
+nav {
+  background-color: #ffffff;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+.logo {
+  color: lavender;
+  font-size: 35px;
+  padding: 10px 20px;
+  border: solid 1px #48bb78;
+  background-color: #48bb78;
+  border-radius: 5px;
+}
+
+.p-wallet, .p-nftbal {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem 0;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.for-button {
+  background: #008000;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  text-decoration: none;
+  text-shadow: none;
+  box-shadow: 2px 2px 0px #005c00; 
+  font-family: 'kemco';
+}
+
+.for-button:hover {
+  background: #008000;
+  box-shadow: 1px 1px 0px #005c00;
+  transform: translate(1px, 1px);
+}
+
+.against-button {
+  background: #ff0000;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  text-decoration: none;
+  text-shadow: none;
+  box-shadow: 2px 2px 0px #b70101; 
+  font-family: 'kemco';
+}
+
+.against-button:hover {
+  background: #ff0000;
+  box-shadow: 1px 1px 0px #b70101;
+  transform: translate(1px, 1px);
+}
+
+.con-wallet{
+    background: #ffc20e;
+    color: #ff0b0b;
+    border: none;
+    padding: 15px 30px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    text-decoration: none;
+    text-shadow: none;
+    box-shadow: 2px 2px 0px #c49512; 
+    font-family: 'kemco';
+}
+
+.con-wallet:hover {
+  background: #ffc20e;
+  box-shadow: 1px 1px 0px #c49512;
+  transform: translate(1px, 1px);
+}
+
+.d-conwallet {
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+}
+
+.proposal-div {
+  border-color: #ffc20e;
+  background-color: #ffc20e;
+}
+
+.proposal-desc {
+  font-family: 'montserrat', sans-serif;
+  font-weight: 400;
+}
+
+.hero {
+  height: 80vh;
+  align-content: center;
+}
+
+.header-h1 {
+  text-align: center;
+  font-size: 40px;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.header-h3 {
+  text-align: center;
+  padding-bottom: 20px;
+  color: white;
 }
