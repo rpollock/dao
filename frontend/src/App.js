@@ -47,7 +47,6 @@ function App() {
     }
   };
 
-  // ✅ Wrap fetchProposals with useCallback
   const fetchProposals = useCallback(async () => {
     if (!provider || !account) return;
     
@@ -83,7 +82,8 @@ function App() {
     } catch (error) {
       console.error('Error fetching proposals:', error);
     }
-  }, [provider, account]); // ✅ Add dependencies
+  }, [provider, account]);
+
   const handleVote = async (proposalId, isFor) => {
     if (!provider || !account) return;
     
@@ -102,8 +102,6 @@ function App() {
     }
   };
   
-
-  // ✅ Wrap fetchNFTBalance with useCallback
   const fetchNFTBalance = useCallback(async () => {
     if (!provider || !account) return;
     
@@ -114,9 +112,8 @@ function App() {
     } catch (error) {
       console.error('Error fetching NFT balance:', error);
     }
-  }, [provider, account]); // ✅ Add dependencies
+  }, [provider, account]);
 
-  // ✅ Update useEffect to use stable function references
   useEffect(() => {
     if (account) {
       fetchProposals();
